@@ -21,7 +21,6 @@ class CreateUsersTable extends Migration
             $table->string('phone')->nullable();
             $table->string('description')->nullable();
             $table->string('skills')->nullable();
-            $table->string('image')->nullable();
             $table->time('work_hour_start')->nullable();
             $table->time('work_hour_end')->nullable();
             $table->timestamps();

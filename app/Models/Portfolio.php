@@ -15,7 +15,7 @@ class Portfolio extends Model
      * @var array
      */
     protected $fillable = [
-        'id_user', 'title', 'description', 'id_image'
+        'title', 'description'
     ];
 
     /**
@@ -26,4 +26,14 @@ class Portfolio extends Model
     protected $hidden = [
         
     ];
+    
+    public function image()
+    {
+        return $this->hasOne(Image::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

@@ -28,10 +28,33 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      *
      * @var array
      */
-    protected $hidden = [
-        
-    ];
-    
+    protected $hidden = [];
+
+    public function image()
+    {
+        return $this->hasOne(Image::class);
+    }
+
+    public function album()
+    {
+        return $this->hasMany(Album::class);
+    }
+
+    public function jobs()
+    {
+        return $this->hasMany(Job::class);
+    }
+
+    public function portfolios()
+    {
+        return $this->hasMany(Portfolio::class);
+    }
+
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
+
     public function getJWTIdentifier()
     {
         return $this->getKey();

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Image extends Model
+class Category extends Model
 {
     use HasFactory;
 
@@ -15,7 +15,7 @@ class Image extends Model
      * @var array
      */
     protected $fillable = [
-        'src'
+        'category', 'description',
     ];
 
     /**
@@ -26,19 +26,4 @@ class Image extends Model
     protected $hidden = [
         
     ];
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-    
-    public function album()
-    {
-        return $this->belongsTo(Album::class);
-    }
-    
-    public function porfolio()
-    {
-        return $this->belongsTo(Portfolio::class);
-    }
 }

@@ -15,7 +15,7 @@ class Album extends Model
      * @var array
      */
     protected $fillable = [
-        
+        'title'
     ];
 
     /**
@@ -26,4 +26,19 @@ class Album extends Model
     protected $hidden = [
         
     ];
+    
+    public function images()
+    {
+        return $this->hasMany(Image::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+    
+    public function product()
+    {
+        return $this->belongsTo(Portfolio::class);
+    }
 }

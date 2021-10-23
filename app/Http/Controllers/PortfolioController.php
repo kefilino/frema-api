@@ -12,12 +12,12 @@ class PortfolioController extends Controller
     public function showPortfolio()
     {
         $user = JWTAuth::user();
-        return response()->json(Portfolio::where('id_user', $user->id)->get());
+        return response()->json(Portfolio::with('image')->where('user_id', $user->id)->get());
     }
 
     public function showPortfolioByUserId($id)
     {
-        return response()->json(Portfolio::find($id));
+        return response()->json(Portfolio::with('image')->where('user_id', $id)->get());
     }
 
     public function create(Request $request)
@@ -30,23 +30,21 @@ class PortfolioController extends Controller
             'image' => 'image',
         ]);
 
-        $portfolio = Portfolio::create([
-            'id_user' => $user->id,
+        $portfolio = $user->portfolios()->create([
+            'user_id' => $user->id,
             'title' => $request->title,
             'description' => $request->description,
         ]);
 
         if ($request->file('image')) {
             $filename = $portfolio->id . '.' . $request->file('image')->extension();
-            $request->file('image')->move(storage_path('portfolio'), $filename);
-            $image = Image::create([
-                'src' => storage_path('portfolio') . '/' . $filename
-            ]);
-            $portfolio->update([
-                'id_image' => $image->id
-            ]);
+            $request->file('image')->move('portfolio', $filename);
+            $portfolio->image()->save(
+                new Image(['src' => 'public/portfolio/' . $filename])
+            );
         }
 
+        
         return response()->json($portfolio, 201);
     }
 
@@ -62,19 +60,21 @@ class PortfolioController extends Controller
 
         $portfolio = Portfolio::findOrFail($id);
 
-        if ($portfolio->id_user != $user->id) {            
+        if ($portfolio->user_id != $user->id) {            
             return response()->json(['status' => 'error', 'message' => 'User ID mismatch']);
         }
 
         $portfolio->update([
-            'id_user' => $user->id,
             'title' => $request->title,
             'description' => $request->description,
         ]);
 
         if ($request->file('image')) {
             $filename = $portfolio->id . '.' . $request->file('image')->extension();
-            $request->file('image')->move(storage_path('portfolio'), $filename);
+            $request->file('image')->move('portfolio', $filename);
+            $portfolio->image()->save(
+                new Image(['src' => 'public/portfolio/' . $filename])
+            );
         }
 
         return response()->json($portfolio, 201);
@@ -86,7 +86,7 @@ class PortfolioController extends Controller
 
         $portfolio = Portfolio::findOrFail($id);
 
-        if ($portfolio->id_user != $user->id) {            
+        if ($portfolio->user_id != $user->id) {            
             return response()->json(['status' => 'error', 'message' => 'User ID mismatch']);
         }
 

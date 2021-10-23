@@ -26,7 +26,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->post('logout', ['uses' => 'UserController@logout']);
 
         $router->group(['prefix' => 'users'], function () use ($router) {
-            $router->get('/', ['uses' => 'UserController@showAllUsers']);
+            $router->get('/', ['uses' => 'UserController@showUserInfo']);
             $router->get('{id}', ['uses' => 'UserController@showUserById']);
             $router->put('/', ['uses' => 'UserController@update']);
             $router->delete('/', ['uses' => 'UserController@delete']);
@@ -39,6 +39,23 @@ $router->group(['prefix' => 'api'], function () use ($router) {
             $router->post('/', ['uses' => 'PortfolioController@create']);
             $router->put('{id}', ['uses' => 'PortfolioController@update']);
             $router->delete('{id}', ['uses' => 'PortfolioController@delete']);
+        });
+
+        $router->group(['prefix' => 'product'], function () use ($router) {
+            $router->get('/', ['uses' => 'ProductController@showProducts']);
+            $router->get('{id}', ['uses' => 'ProductController@showProductById']);
+            $router->get('/user/{id}', ['uses' => 'ProductController@showProductsByUserId']);
+            $router->post('/', ['uses' => 'ProductController@create']);
+            $router->put('{id}', ['uses' => 'ProductController@update']);
+            $router->delete('{id}', ['uses' => 'ProductController@delete']);
+        });
+
+        $router->group(['prefix' => 'post'], function () use ($router) {
+            $router->get('/', ['uses' => 'PostController@showAllPosts']);
+            $router->get('{id}', ['uses' => 'PostController@showPostById']);
+            $router->post('/', ['uses' => 'PostController@create']);
+            $router->put('{id}', ['uses' => 'PostController@update']);
+            $router->delete('{id}', ['uses' => 'PostController@delete']);
         });
     });
 });

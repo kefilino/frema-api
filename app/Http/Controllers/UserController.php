@@ -2,21 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Image;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class UserController extends Controller
 {
-    public function showAllUsers()
-    {
-        return response()->json(User::all());
+    public function showUserInfo()
+    {        
+        return response()->json(User::with('image')->find(JWTAuth::user()->id));
     }
 
     public function showUserById($id)
     {
-        return response()->json(User::find($id));
+        return response()->json(User::with('image')->find($id));
     }
 
     public function create(Request $request)
@@ -39,34 +41,51 @@ class UserController extends Controller
     public function update(Request $request)
     {
         $user = JWTAuth::user();
+
         $this->validate($request, [
             'name' => 'required',
-            'email' => 'required|email|unique:users',
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('users')->ignore($user->id)
+            ],
             'password' => 'required|min:8',
             'new_password' => 'min:8',
             'new_password_confirmation' => 'min:8|same:password',
-            'phone' => 'required|unique:users|numeric|digits_between:10,13'
+            'phone' => [
+                'required',
+                'numeric',
+                'digits_between:10,13',
+                Rule::unique('users')->ignore($user->id)
+            ],
+            'image' => 'image'
         ]);
 
-        if (!Hash::check($user->password, $request->password)) {
+        if (!Hash::check($request->password, $user->password)) {
             return response()->json(['status' => 'error', 'message' => 'Incorrect password']);
         }
         $password = $request->new_password ? $request->new_password : $request->password;
-        $request->file('image')->move(storage_path('avatar'), $user->id);
 
-        $user = User::findOrFail($user->id)->update([
+        $status = $user->update([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($password),
             'phone' => $request->phone,
             'description' => $request->description,
             'skills' => $request->skills,
-            'image' => storage_path('avatar') . '/' . $user->id,
             'work_hour_start' => $request->work_hour_start,
             'work_hour_end' => $request->work_hour_end
         ]);
 
-        return response()->json($user, 200);
+        if ($request->file('image')) {
+            $filename = $user->id . '.' . $request->file('image')->extension();
+            $request->file('image')->move('avatar', $filename);
+            $user->image()->save(
+                new Image(['src' => 'public/avatar/' . $filename])
+            );
+        }
+
+        return response()->json($status, 200);
     }
 
     public function delete()
