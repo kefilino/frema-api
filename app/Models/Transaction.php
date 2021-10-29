@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Album extends Model
+class Transaction extends Model
 {
     use HasFactory;
 
@@ -15,7 +15,7 @@ class Album extends Model
      * @var array
      */
     protected $fillable = [
-        'title'
+        'buyer_id', 'seller_id', 'qty', 'price', 'total', 'status', 'payment_file', 'product_file'
     ];
 
     /**
@@ -26,24 +26,19 @@ class Album extends Model
     protected $hidden = [
         
     ];
-    
-    public function images()
+
+    public function buyer()
     {
-        return $this->hasMany(Image::class);
+        return $this->belongsTo(User::class);
     }
 
-    public function user()
+    public function seller()
     {
         return $this->belongsTo(User::class);
     }
     
     public function product()
     {
-        return $this->belongsTo(Portfolio::class);
-    }
-    
-    public function job()
-    {
-        return $this->belongsTo(Job::class);
+        return $this->belongsTo(Product::class);
     }
 }

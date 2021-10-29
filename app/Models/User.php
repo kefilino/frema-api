@@ -55,6 +55,16 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         return $this->hasMany(Product::class);
     }
 
+    public function purchases()
+    {
+        return $this->hasMany(Transaction::class, 'buyer_id');
+    }
+
+    public function sales()
+    {
+        return $this->hasMany(Transaction::class, 'seller_id');
+    }
+
     public function getJWTIdentifier()
     {
         return $this->getKey();

@@ -12,13 +12,37 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 class UserController extends Controller
 {
     public function showUserInfo()
-    {        
-        return response()->json(User::with('image')->find(JWTAuth::user()->id));
+    {
+        $user = User::with('image')->find(JWTAuth::user()->id);
+        $response = [
+            'id' => $user->id,
+            'email' => $user->email,
+            'name' => $user->name,
+            'phone' => $user->phone,
+            'description' => $user->description,
+            'skills' => $user->skills,
+            'work_hour_start' => $user->work_hour_start,
+            'work_hour_end' => $user->work_hour_end,
+            'avatar' => $user->image->src
+        ];
+        return response()->json($response);
     }
 
     public function showUserById($id)
     {
-        return response()->json(User::with('image')->find($id));
+        $user = User::with('image')->find($id);
+        $response = [
+            'id' => $user->id,
+            'email' => $user->email,
+            'name' => $user->name,
+            'phone' => $user->phone,
+            'description' => $user->description,
+            'skills' => $user->skills,
+            'work_hour_start' => $user->work_hour_start,
+            'work_hour_end' => $user->work_hour_end,
+            'avatar' => $user->image->src
+        ];
+        return response()->json($response);
     }
 
     public function create(Request $request)
@@ -78,6 +102,11 @@ class UserController extends Controller
         ]);
 
         if ($request->file('image')) {
+            if ($user->image) {
+                $user->image->user()->dissociate();
+                $user->image->save();
+            }
+
             $filename = $user->id . '.' . $request->file('image')->extension();
             $request->file('image')->move('avatar', $filename);
             $user->image()->save(

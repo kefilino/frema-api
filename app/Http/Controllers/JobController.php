@@ -10,15 +10,25 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class JobController extends Controller
 {
-    public function showJob()
+    public function showJobs()
     {
-        $user = JWTAuth::user();
-        return response()->json(Job::with('image')->where('user_id', $user->id)->get());
+        return response()->json(Job::with('album.images')->get());
     }
 
-    public function showJobByUserId($id)
+    public function showJobsById($id)
     {
-        return response()->json(Job::with('image')->where('user_id', $id)->get());
+        return response()->json(Job::with('album.images')->where('id', $id)->get());
+    }
+    
+    public function showUserJobs()
+    {
+        $user = JWTAuth::user();
+        return response()->json(Job::with('album.images')->where('user_id', $user->id)->get());
+    }
+
+    public function showJobsByUserId($id)
+    {
+        return response()->json(Job::with('album.images')->where('user_id', $id)->get());
     }
 
     public function create(Request $request)
@@ -49,7 +59,7 @@ class JobController extends Controller
             $job->album()->save($album);
         }
 
-        
+        $job->refresh();
         return response()->json($job, 201);
     }
 
@@ -75,6 +85,11 @@ class JobController extends Controller
         ]);
 
         if ($request->file('images')) {
+            if ($job->album) {
+                $job->album->product()->dissociate();
+                $job->album->save();
+            }
+
             $album = Album::create(['title' => $request->title]);
             foreach ($request->file('images') as $i => $image) {
                 $filename = $job->id . '_' . $i . '.' . $image->extension();
@@ -86,6 +101,7 @@ class JobController extends Controller
             $job->album()->save($album);
         }
 
+        $job->refresh();
         return response()->json($job, 201);
     }
 

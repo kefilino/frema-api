@@ -37,7 +37,7 @@ class Image extends Model
         return $this->belongsTo(Album::class);
     }
     
-    public function porfolio()
+    public function portfolio()
     {
         return $this->belongsTo(Portfolio::class);
     }

@@ -25,12 +25,11 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->group(['middleware' => 'auth'], function () use ($router) {
         $router->post('logout', ['uses' => 'UserController@logout']);
 
-        $router->group(['prefix' => 'users'], function () use ($router) {
+        $router->group(['prefix' => 'user'], function () use ($router) {
             $router->get('/', ['uses' => 'UserController@showUserInfo']);
             $router->get('{id}', ['uses' => 'UserController@showUserById']);
             $router->put('/', ['uses' => 'UserController@update']);
             $router->delete('/', ['uses' => 'UserController@delete']);
-            $router->delete('/deleteall', ['uses' => 'UserController@deleteAll']);
         });
 
         $router->group(['prefix' => 'portfolio'], function () use ($router) {
@@ -50,12 +49,24 @@ $router->group(['prefix' => 'api'], function () use ($router) {
             $router->delete('{id}', ['uses' => 'ProductController@delete']);
         });
 
-        $router->group(['prefix' => 'post'], function () use ($router) {
-            $router->get('/', ['uses' => 'PostController@showAllPosts']);
-            $router->get('{id}', ['uses' => 'PostController@showPostById']);
-            $router->post('/', ['uses' => 'PostController@create']);
-            $router->put('{id}', ['uses' => 'PostController@update']);
-            $router->delete('{id}', ['uses' => 'PostController@delete']);
+        $router->group(['prefix' => 'transaction'], function () use ($router) {
+            $router->get('/', ['uses' => 'TransactionController@showUserTransactions']);
+            $router->get('/purchases', ['uses' => 'TransactionController@showUserPurchases']);
+            $router->get('/sales', ['uses' => 'TransactionController@showUserSales']);
+            $router->get('{id}', ['uses' => 'TransactionController@showUserTransactionsById']);
+            $router->post('/', ['uses' => 'TransactionController@create']);
+            $router->put('/pay/{id}', ['uses' => 'TransactionController@insertPaymentProof']);
+            $router->put('/submit/{id}', ['uses' => 'TransactionController@insertProductProof']);
+        });
+
+        $router->group(['prefix' => 'job'], function () use ($router) {
+            $router->get('/all', ['uses' => 'JobController@showJobs']);
+            $router->get('{id}', ['uses' => 'JobController@showJobsById']);
+            $router->get('/', ['uses' => 'JobController@showUserJobs']);
+            $router->get('/user/{id}', ['uses' => 'JobController@showJobsByUserId']);
+            $router->post('/', ['uses' => 'JobController@create']);
+            $router->put('{id}', ['uses' => 'JobController@update']);
+            $router->delete('{id}', ['uses' => 'JobController@delete']);
         });
     });
 });

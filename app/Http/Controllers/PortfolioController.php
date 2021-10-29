@@ -44,7 +44,7 @@ class PortfolioController extends Controller
             );
         }
 
-        
+        $portfolio->refresh();
         return response()->json($portfolio, 201);
     }
 
@@ -70,6 +70,11 @@ class PortfolioController extends Controller
         ]);
 
         if ($request->file('image')) {
+            if ($portfolio->image) {
+                $portfolio->image->portfolio()->dissociate();
+                $portfolio->image->save();
+            }
+
             $filename = $portfolio->id . '.' . $request->file('image')->extension();
             $request->file('image')->move('portfolio', $filename);
             $portfolio->image()->save(
@@ -77,6 +82,7 @@ class PortfolioController extends Controller
             );
         }
 
+        $portfolio->refresh();
         return response()->json($portfolio, 201);
     }
 

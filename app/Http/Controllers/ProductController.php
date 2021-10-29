@@ -12,8 +12,11 @@ class ProductController extends Controller
 {
     public function showProducts()
     {
-        $user = JWTAuth::user();
-        return response()->json(Product::where('user_id', $user->id)->get());
+        $products = Product::with('album.images')
+            ->where('user_id', JWTAuth::user()->id)
+            ->select('id')
+            ->get();
+        return response()->json($products);
     }
 
     public function showProductById($id)
@@ -45,17 +48,20 @@ class ProductController extends Controller
         ]);
 
         if ($request->file('images')) {
+            $images = [];
             $album = Album::create(['title' => $request->title]);
             foreach ($request->file('images') as $i => $image) {
                 $filename = $product->id . '_' . $i . '.' . $image->extension();
                 $image->move('product', $filename);
-                $album->images()->save(
-                    new Image(['src' => 'public/product/' . $filename])
-                );
+                array_push($images, new Image(['src' => 'public/product/' . $filename]));
             }
+            $album->images()->saveMany(
+                $images
+            );
             $product->album()->save($album);
         }
 
+        $product->refresh();
         return response()->json($product, 201);
     }
 
@@ -82,7 +88,12 @@ class ProductController extends Controller
             'description' => $request->description,
         ]);
 
-        if ($request->file('images')) {
+        if ($request->hasfile('images')) {
+            if ($product->album) {
+                $product->album->product()->dissociate();
+                $product->album->save();
+            }
+            
             $album = Album::create(['title' => $request->title]);
             foreach ($request->file('images') as $i => $image) {
                 $filename = $product->id . '_' . $i . '.' . $image->extension();
@@ -94,6 +105,7 @@ class ProductController extends Controller
             $product->album()->save($album);
         }
 
+        $product->refresh();
         return response()->json($product, 201);
     }
 
