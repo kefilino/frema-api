@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Album;
-use App\Models\Image;
 use App\Models\Product;
 use App\Models\Transaction;
 use Illuminate\Http\Request;

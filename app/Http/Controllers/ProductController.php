@@ -14,7 +14,6 @@ class ProductController extends Controller
     {
         $products = Product::with('album.images')
             ->where('user_id', JWTAuth::user()->id)
-            ->select('id')
             ->get();
         return response()->json($products);
     }

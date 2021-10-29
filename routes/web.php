@@ -49,6 +49,15 @@ $router->group(['prefix' => 'api'], function () use ($router) {
             $router->delete('{id}', ['uses' => 'ProductController@delete']);
         });
 
+        $router->group(['prefix' => 'review'], function () use ($router) {
+            $router->get('/', ['uses' => 'ReviewController@showReviewsAsClient']);
+            $router->get('/sales', ['uses' => 'ReviewController@showReviewsAsFreelancer']);
+            $router->get('{id}', ['uses' => 'ReviewController@showReviewById']);
+            $router->get('/product/{id}', ['uses' => 'ReviewController@showReviewByProductId']);
+            $router->get('/user/{id}', ['uses' => 'ReviewController@showReviewByUserId']);
+            $router->post('{id}', ['uses' => 'ReviewController@create']);
+        });
+
         $router->group(['prefix' => 'transaction'], function () use ($router) {
             $router->get('/', ['uses' => 'TransactionController@showUserTransactions']);
             $router->get('/purchases', ['uses' => 'TransactionController@showUserPurchases']);

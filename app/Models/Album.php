@@ -31,19 +31,24 @@ class Album extends Model
     {
         return $this->hasMany(Image::class);
     }
+    
+    public function job()
+    {
+        return $this->belongsTo(Job::class);
+    }
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
+
+    public function review()
+    {
+        return $this->belongsTo(Review::class);
+    }
     
     public function product()
     {
         return $this->belongsTo(Portfolio::class);
-    }
-    
-    public function job()
-    {
-        return $this->belongsTo(Job::class);
     }
 }

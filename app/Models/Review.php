@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Product extends Model
+class Review extends Model
 {
     use HasFactory;
 
@@ -15,7 +15,7 @@ class Product extends Model
      * @var array
      */
     protected $fillable = [
-        'title', 'description', 'price', 'availability'
+        'rating', 'review'
     ];
 
     /**
@@ -31,24 +31,24 @@ class Product extends Model
     {
         return $this->hasOne(Album::class);
     }
-    
-    public function categories()
-    {
-        return $this->hasMany(Category::class);
-    }
 
-    public function user()
+    public function client()
     {
         return $this->belongsTo(User::class);
     }
-    
-    public function reviews()
+
+    public function freelancer()
     {
-        return $this->hasMany(Review::class);
+        return $this->belongsTo(User::class);
     }
-    
-    public function transactions()
+
+    public function product()
     {
-        return $this->hasMany(Transaction::class);
+        return $this->belongsTo(Product::class);
+    }
+
+    public function transaction()
+    {
+        return $this->belongsTo(Transaction::class);
     }
 }

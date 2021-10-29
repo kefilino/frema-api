@@ -59,6 +59,16 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     {
         return $this->hasMany(Transaction::class, 'buyer_id');
     }
+    
+    public function reviewsAsClient()
+    {
+        return $this->hasMany(Review::class, 'client_id');
+    }
+    
+    public function reviewsAsFreelancer()
+    {
+        return $this->hasMany(Review::class, 'freelancer_id');
+    }
 
     public function sales()
     {

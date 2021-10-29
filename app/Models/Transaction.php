@@ -41,4 +41,9 @@ class Transaction extends Model
     {
         return $this->belongsTo(Product::class);
     }
+    
+    public function review()
+    {
+        return $this->hasOne(Review::class);
+    }
 }
