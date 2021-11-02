@@ -12,20 +12,17 @@ class ProductController extends Controller
 {
     public function showProducts()
     {
-        $products = Product::with('album.images')
-            ->where('user_id', JWTAuth::user()->id)
-            ->get();
-        return response()->json($products);
+        return response()->json(Product::with('album.images')->where('user_id', JWTAuth::user()->id)->get(), 200);
     }
 
     public function showProductById($id)
     {
-        return response()->json(Product::find($id));
+        return response()->json(Product::with('album.images')->find($id), 200);
     }
 
     public function showProductsByUserId($id)
     {
-        return response()->json(Product::where('user_id', $id)->get());
+        return response()->json(Product::with('album.images')->where('user_id', $id)->get(), 200);
     }
 
     public function create(Request $request)
@@ -78,7 +75,7 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
 
         if ($product->user_id != $user->id) {            
-            return response()->json(['status' => 'error', 'message' => 'User ID mismatch']);
+            return response()->json(['status' => 'error', 'message' => 'User ID mismatch'], 401);
         }
 
         $product->update([
@@ -93,7 +90,7 @@ class ProductController extends Controller
                 $product->album->save();
             }
             
-            $album = Album::create(['title' => $request->title]);
+            $album = $product->album;
             foreach ($request->file('images') as $i => $image) {
                 $filename = $product->id . '_' . $i . '.' . $image->extension();
                 $image->move('product', $filename);
@@ -105,7 +102,7 @@ class ProductController extends Controller
         }
 
         $product->refresh();
-        return response()->json($product, 201);
+        return response()->json($product, 200);
     }
 
     public function delete($id)
@@ -115,11 +112,35 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
 
         if ($product->user_id != $user->id) {            
-            return response()->json(['status' => 'error', 'message' => 'User ID mismatch']);
+            return response()->json(['status' => 'error', 'message' => 'User ID mismatch'], 401);
         }
 
         $product->delete();
 
         return response()->json($product, 201);
+    }
+
+    public function deleteProductImage($id, $index)
+    {
+        $user = JWTAuth::user();
+
+        $product = Product::findOrFail($id);
+
+        if ($product->user_id != $user->id) {
+            return response()->json(['status' => 'error', 'message' => 'User ID mismatch'], 401);
+        }
+
+        if (sizeof($product->album->images) == 1) {
+            return response()->json(['status' => 'error', 'message' => 'Product has to have at least one image'], 403);
+        }
+
+        if ($index > sizeof($product->album->images) || $index < 1) {
+            return response()->json(['status' => 'error', 'message' => 'Index out of bounds'], 400);
+        }
+
+        $product->album->images[$index-1]->album()->dissociate();
+        $product->album->images[$index-1]->save();
+
+        return response()->json($product, 200);
     }
 }

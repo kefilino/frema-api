@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Image;
+use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -25,10 +26,10 @@ class UserController extends Controller
             'work_hour_end' => $user->work_hour_end,
             'avatar' => $user->image->src
         ];
-        return response()->json($response);
+        return response()->json($response, 200);
     }
 
-    public function showUserById($id)
+    public function showUserInfoById($id)
     {
         $user = User::with('image')->find($id);
         $response = [
@@ -42,7 +43,40 @@ class UserController extends Controller
             'work_hour_end' => $user->work_hour_end,
             'avatar' => $user->image->src
         ];
-        return response()->json($response);
+        return response()->json($response, 200);
+    }
+
+    public function showUserNotifications()
+    {
+        return response()->json(User::find(JWTAuth::user()->id)->notifications, 200);
+    }
+
+    public function markNotificationAsRead($id)
+    {
+        $notification = Notification::find($id);
+
+        if ($notification->user_id != JWTAuth::user()->id) {
+            return response()->json(['status' => 'error', 'message' => 'User ID mismatch - Unauthorized'], 401);
+        }
+
+        $notification->update([
+            'is_read' => true
+        ]);
+
+        return response()->json($notification, 200);
+    }
+
+    public function markNotificationsAsRead()
+    {
+        $notifications = JWTAuth::user()->notifications;
+
+        foreach ($notifications as $notification) {
+            $notification->update([
+                'is_read' => true
+            ]);
+        }
+
+        return response()->json($notifications, 200);
     }
 
     public function create(Request $request)
@@ -53,13 +87,13 @@ class UserController extends Controller
             'password' => 'required|min:8',
             'password_confirmation' => 'required|min:8|same:password',
         ]);
-        $user = User::create([
+        User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
-        return response()->json($user, 201);
+        return response()->json(true, 201);
     }
 
     public function update(Request $request)
@@ -86,7 +120,7 @@ class UserController extends Controller
         ]);
 
         if (!Hash::check($request->password, $user->password)) {
-            return response()->json(['status' => 'error', 'message' => 'Incorrect password']);
+            return response()->json(['status' => 'error', 'message' => 'Incorrect password'], 401);
         }
         $password = $request->new_password ? $request->new_password : $request->password;
 
@@ -132,7 +166,7 @@ class UserController extends Controller
 
         // Check if field is empty
         if (empty($email) || empty($password)) {
-            return response()->json(['status' => 'error', 'message' => 'You must fill all the fields']);
+            return response()->json(['status' => 'error', 'message' => 'You must fill all the fields'], 400);
         }
 
         $credentials = request(['email', 'password']);
@@ -148,7 +182,7 @@ class UserController extends Controller
     {
         JWTAuth::logout();
 
-        return response()->json(['message' => 'Successfully logged out']);
+        return response()->json(['message' => 'Successfully logged out'], 200);
     }
 
     protected function respondWithToken($token)

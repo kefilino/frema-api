@@ -12,23 +12,23 @@ class JobController extends Controller
 {
     public function showJobs()
     {
-        return response()->json(Job::with('album.images')->get());
+        return response()->json(Job::with('album.images')->get(), 200);
     }
 
     public function showJobsById($id)
     {
-        return response()->json(Job::with('album.images')->where('id', $id)->get());
+        return response()->json(Job::with('album.images')->where('id', $id)->get(), 200);
     }
     
     public function showUserJobs()
     {
         $user = JWTAuth::user();
-        return response()->json(Job::with('album.images')->where('user_id', $user->id)->get());
+        return response()->json(Job::with('album.images')->where('user_id', $user->id)->get(), 200);
     }
 
     public function showJobsByUserId($id)
     {
-        return response()->json(Job::with('album.images')->where('user_id', $id)->get());
+        return response()->json(Job::with('album.images')->where('user_id', $id)->get(), 200);
     }
 
     public function create(Request $request)
@@ -76,7 +76,7 @@ class JobController extends Controller
         $job = Job::findOrFail($id);
 
         if ($job->user_id != $user->id) {            
-            return response()->json(['status' => 'error', 'message' => 'User ID mismatch']);
+            return response()->json(['status' => 'error', 'message' => 'User ID mismatch'], 401);
         }
 
         $job->update([
@@ -102,7 +102,7 @@ class JobController extends Controller
         }
 
         $job->refresh();
-        return response()->json($job, 201);
+        return response()->json($job, 200);
     }
 
     public function delete($id)
@@ -112,11 +112,11 @@ class JobController extends Controller
         $job = Job::findOrFail($id);
 
         if ($job->user_id != $user->id) {            
-            return response()->json(['status' => 'error', 'message' => 'User ID mismatch']);
+            return response()->json(['status' => 'error', 'message' => 'User ID mismatch'], 401);
         }
 
         $job->delete();
 
-        return response()->json($job, 201);
+        return response()->json($job, 200);
     }
 }

@@ -33,7 +33,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     public function image()
     {
         return $this->hasOne(Image::class)->withDefault([
-            'src' => '@/assets/images/imgBlank.jpg',
+            'src' => '',
         ]);
     }
 
@@ -45,6 +45,11 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     public function jobs()
     {
         return $this->hasMany(Job::class);
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
     }
 
     public function portfolios()

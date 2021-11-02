@@ -12,12 +12,12 @@ class PortfolioController extends Controller
     public function showPortfolio()
     {
         $user = JWTAuth::user();
-        return response()->json(Portfolio::with('image')->where('user_id', $user->id)->get());
+        return response()->json(Portfolio::with('image')->where('user_id', $user->id)->get(), 200);
     }
 
     public function showPortfolioByUserId($id)
     {
-        return response()->json(Portfolio::with('image')->where('user_id', $id)->get());
+        return response()->json(Portfolio::with('image')->where('user_id', $id)->get(), 200);
     }
 
     public function create(Request $request)
@@ -61,7 +61,7 @@ class PortfolioController extends Controller
         $portfolio = Portfolio::findOrFail($id);
 
         if ($portfolio->user_id != $user->id) {            
-            return response()->json(['status' => 'error', 'message' => 'User ID mismatch']);
+            return response()->json(['status' => 'error', 'message' => 'User ID mismatch'], 401);
         }
 
         $portfolio->update([
@@ -83,7 +83,7 @@ class PortfolioController extends Controller
         }
 
         $portfolio->refresh();
-        return response()->json($portfolio, 201);
+        return response()->json($portfolio, 200);
     }
 
     public function delete($id)
@@ -93,11 +93,27 @@ class PortfolioController extends Controller
         $portfolio = Portfolio::findOrFail($id);
 
         if ($portfolio->user_id != $user->id) {            
-            return response()->json(['status' => 'error', 'message' => 'User ID mismatch']);
+            return response()->json(['status' => 'error', 'message' => 'User ID mismatch'], 401);
         }
 
         $portfolio->delete();
 
-        return response()->json($portfolio, 201);
+        return response()->json($portfolio, 200);
+    }
+
+    public function deletePortfolioImage($id)
+    {
+        $user = JWTAuth::user();
+
+        $portfolio = Portfolio::findOrFail($id);
+
+        if ($portfolio->user_id != $user->id) {            
+            return response()->json(['status' => 'error', 'message' => 'User ID mismatch'], 401);
+        }
+
+        $portfolio->image->portfolio()->dissociate();
+        $portfolio->image->save();
+
+        return response()->json($portfolio, 200);
     }
 }

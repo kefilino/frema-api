@@ -16,7 +16,7 @@ class ReviewController extends Controller
         $reviews = Review::with('album.images')
             ->where('client_id', JWTAuth::user()->id)
             ->get();
-        return response()->json($reviews);
+        return response()->json($reviews, 200);
     }
 
     public function showReviewsAsFreelancer()
@@ -24,22 +24,22 @@ class ReviewController extends Controller
         $reviews = Review::with('album.images')
             ->where('freelancer_id', JWTAuth::user()->id)
             ->get();
-        return response()->json($reviews);
+        return response()->json($reviews, 200);
     }
 
     public function showReviewById($id)
     {
-        return response()->json(Review::find($id));
+        return response()->json(Review::find($id), 200);
     }
 
     public function showReviewByProductId($id)
     {
-        return response()->json(Review::where('product_id', $id)->get());
+        return response()->json(Review::where('product_id', $id)->get(), 200);
     }
 
     public function showReviewByUserId($id)
     {
-        return response()->json(Review::where('client_id', $id)->orWhere('freelancer_id', $id)->get());
+        return response()->json(Review::where('client_id', $id)->orWhere('freelancer_id', $id)->get(), 200);
     }
 
     public function create($id, Request $request)

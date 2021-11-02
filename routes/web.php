@@ -27,7 +27,10 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 
         $router->group(['prefix' => 'user'], function () use ($router) {
             $router->get('/', ['uses' => 'UserController@showUserInfo']);
-            $router->get('{id}', ['uses' => 'UserController@showUserById']);
+            $router->get('/notification', ['uses' => 'UserController@showUserNotifications']);
+            $router->get('{id}', ['uses' => 'UserController@showUserInfoById']);
+            $router->post('/notification', ['uses' => 'UserController@markNotificationsAsRead']);
+            $router->post('/notification/{id}', ['uses' => 'UserController@markNotificationAsRead']);
             $router->put('/', ['uses' => 'UserController@update']);
             $router->delete('/', ['uses' => 'UserController@delete']);
         });
@@ -38,6 +41,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
             $router->post('/', ['uses' => 'PortfolioController@create']);
             $router->put('{id}', ['uses' => 'PortfolioController@update']);
             $router->delete('{id}', ['uses' => 'PortfolioController@delete']);
+            $router->delete('/image/{id}', ['uses' => 'PortfolioController@deletePortfolioImage']);
         });
 
         $router->group(['prefix' => 'product'], function () use ($router) {
@@ -47,6 +51,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
             $router->post('/', ['uses' => 'ProductController@create']);
             $router->put('{id}', ['uses' => 'ProductController@update']);
             $router->delete('{id}', ['uses' => 'ProductController@delete']);
+            $router->delete('{id}/image/{index}', ['uses' => 'ProductController@deleteProductImage']);
         });
 
         $router->group(['prefix' => 'review'], function () use ($router) {
@@ -64,6 +69,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
             $router->get('/sales', ['uses' => 'TransactionController@showUserSales']);
             $router->get('{id}', ['uses' => 'TransactionController@showUserTransactionsById']);
             $router->post('/', ['uses' => 'TransactionController@create']);
+            $router->post('/complete/{id}', ['uses' => 'TransactionController@completeTransaction']);
             $router->put('/pay/{id}', ['uses' => 'TransactionController@insertPaymentProof']);
             $router->put('/submit/{id}', ['uses' => 'TransactionController@insertProductProof']);
         });
