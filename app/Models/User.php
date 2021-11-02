@@ -32,7 +32,9 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
     public function image()
     {
-        return $this->hasOne(Image::class);
+        return $this->hasOne(Image::class)->withDefault([
+            'src' => '@/assets/images/imgBlank.jpg',
+        ]);
     }
 
     public function album()
