@@ -144,7 +144,7 @@ class UserController extends Controller
             $filename = $user->id . '.' . $request->file('image')->extension();
             $request->file('image')->move('avatar', $filename);
             $user->image()->save(
-                new Image(['src' => 'public/avatar/' . $filename])
+                new Image(['src' => 'avatar/' . $filename])
             );
         }
 

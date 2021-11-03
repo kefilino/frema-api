@@ -53,7 +53,7 @@ class JobController extends Controller
                 $filename = $job->id . '_' . $i . '.' . $image->extension();
                 $image->move('job', $filename);
                 $album->images()->save(
-                    new Image(['src' => 'public/job/' . $filename])
+                    new Image(['src' => 'job/' . $filename])
                 );
             }
             $job->album()->save($album);
@@ -95,7 +95,7 @@ class JobController extends Controller
                 $filename = $job->id . '_' . $i . '.' . $image->extension();
                 $image->move('job', $filename);
                 $album->images()->save(
-                    new Image(['src' => 'public/job/' . $filename])
+                    new Image(['src' => 'job/' . $filename])
                 );
             }
             $job->album()->save($album);

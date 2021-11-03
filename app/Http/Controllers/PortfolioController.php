@@ -40,7 +40,7 @@ class PortfolioController extends Controller
             $filename = $portfolio->id . '.' . $request->file('image')->extension();
             $request->file('image')->move('portfolio', $filename);
             $portfolio->image()->save(
-                new Image(['src' => 'public/portfolio/' . $filename])
+                new Image(['src' => 'portfolio/' . $filename])
             );
         }
 
@@ -78,7 +78,7 @@ class PortfolioController extends Controller
             $filename = $portfolio->id . '.' . $request->file('image')->extension();
             $request->file('image')->move('portfolio', $filename);
             $portfolio->image()->save(
-                new Image(['src' => 'public/portfolio/' . $filename])
+                new Image(['src' => 'portfolio/' . $filename])
             );
         }
 

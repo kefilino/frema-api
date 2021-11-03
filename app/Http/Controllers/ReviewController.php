@@ -67,7 +67,7 @@ class ReviewController extends Controller
             foreach ($request->file('images') as $i => $image) {
                 $filename = $review->id . '_' . $i . '.' . $image->extension();
                 $image->move('product', $filename);
-                array_push($images, new Image(['src' => 'public/review/' . $filename]));
+                array_push($images, new Image(['src' => 'review/' . $filename]));
             }
             $album->images()->saveMany(
                 $images

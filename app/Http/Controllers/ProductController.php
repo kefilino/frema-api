@@ -49,7 +49,7 @@ class ProductController extends Controller
             foreach ($request->file('images') as $i => $image) {
                 $filename = $product->id . '_' . $i . '.' . $image->extension();
                 $image->move('product', $filename);
-                array_push($images, new Image(['src' => 'public/product/' . $filename]));
+                array_push($images, new Image(['src' => 'product/' . $filename]));
             }
             $album->images()->saveMany(
                 $images
@@ -95,7 +95,7 @@ class ProductController extends Controller
                 $filename = $product->id . '_' . $i . '.' . $image->extension();
                 $image->move('product', $filename);
                 $album->images()->save(
-                    new Image(['src' => 'public/product/' . $filename])
+                    new Image(['src' => 'product/' . $filename])
                 );
             }
             $product->album()->save($album);
