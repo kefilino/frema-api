@@ -21,8 +21,15 @@ class CreateUsersTable extends Migration
             $table->string('phone')->nullable();
             $table->string('description')->nullable();
             $table->string('skills')->nullable();
+            $table->string('university')->nullable();
+            $table->string('major')->nullable();
+            $table->char('gender')->nullable();
             $table->time('work_hour_start')->nullable();
             $table->time('work_hour_end')->nullable();
+            $table->text('address')->nullable();
+            $table->string('linkedin')->nullable();
+            $table->string('instagram')->nullable();
+            $table->string('github')->nullable();
             $table->timestamps();
         });
     }

@@ -15,35 +15,17 @@ class UserController extends Controller
     public function showUserInfo()
     {
         $user = User::with('image')->find(JWTAuth::user()->id);
-        $response = [
-            'id' => $user->id,
-            'email' => $user->email,
-            'name' => $user->name,
-            'phone' => $user->phone,
-            'description' => $user->description,
-            'skills' => $user->skills,
-            'work_hour_start' => $user->work_hour_start,
-            'work_hour_end' => $user->work_hour_end,
-            'avatar' => $user->image->src
-        ];
-        return response()->json($response, 200);
+        $user->avatar = $user->image->src;
+        unset($user->password, $user->image);
+        return response()->json($user, 200);
     }
 
     public function showUserInfoById($id)
     {
         $user = User::with('image')->find($id);
-        $response = [
-            'id' => $user->id,
-            'email' => $user->email,
-            'name' => $user->name,
-            'phone' => $user->phone,
-            'description' => $user->description,
-            'skills' => $user->skills,
-            'work_hour_start' => $user->work_hour_start,
-            'work_hour_end' => $user->work_hour_end,
-            'avatar' => $user->image->src
-        ];
-        return response()->json($response, 200);
+        $user->avatar = $user->image->src;
+        unset($user->password, $user->image);
+        return response()->json($user, 200);
     }
 
     public function showUserNotifications()
@@ -131,8 +113,15 @@ class UserController extends Controller
             'phone' => $request->phone,
             'description' => $request->description,
             'skills' => $request->skills,
+            'university' => $request->university,
+            'major' => $request->major,
+            'gender' => $request->gender,
             'work_hour_start' => $request->work_hour_start,
-            'work_hour_end' => $request->work_hour_end
+            'work_hour_end' => $request->work_hour_end,
+            'address' => $request->address,
+            'linkedin' => $request->linkedin,
+            'instagram' => $request->instagram,
+            'github' => $request->github
         ]);
 
         if ($request->file('image')) {
