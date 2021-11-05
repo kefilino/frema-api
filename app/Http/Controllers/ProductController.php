@@ -12,17 +12,17 @@ class ProductController extends Controller
 {
     public function showProducts()
     {
-        return response()->json(Product::with('album.images')->where('user_id', JWTAuth::user()->id)->get(), 200);
+        return response()->json(Product::with(['album.images:id,album_id,src', 'user:id,name'])->where('user_id', JWTAuth::user()->id)->get(), 200);
     }
 
     public function showProductById($id)
     {
-        return response()->json(Product::with('album.images')->find($id), 200);
+        return response()->json(Product::with(['album.images:id,album_id,src', 'user:id,name'])->find($id), 200);
     }
 
     public function showProductsByUserId($id)
     {
-        return response()->json(Product::with('album.images')->where('user_id', $id)->get(), 200);
+        return response()->json(Product::with(['album.images:id,album_id,src', 'user:id,name'])->where('user_id', $id)->get(), 200);
     }
 
     public function create(Request $request)
