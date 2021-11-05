@@ -45,7 +45,8 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         });
 
         $router->group(['prefix' => 'product'], function () use ($router) {
-            $router->get('/', ['uses' => 'ProductController@showProducts']);
+            $router->get('/', ['uses' => 'ProductController@showAllProducts']);
+            $router->get('/me', ['uses' => 'ProductController@showUserProducts']);
             $router->get('{id}', ['uses' => 'ProductController@showProductById']);
             $router->get('/user/{id}', ['uses' => 'ProductController@showProductsByUserId']);
             $router->post('/', ['uses' => 'ProductController@create']);

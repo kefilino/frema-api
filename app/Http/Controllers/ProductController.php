@@ -10,7 +10,12 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ProductController extends Controller
 {
-    public function showProducts()
+    public function showAllProducts()
+    {
+        return response()->json(Product::with(['album.images:id,album_id,src', 'user:id,name'])->get(), 200);
+    }
+
+    public function showUserProducts()
     {
         return response()->json(Product::with(['album.images:id,album_id,src', 'user:id,name'])->where('user_id', JWTAuth::user()->id)->get(), 200);
     }
