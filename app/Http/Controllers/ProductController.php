@@ -15,7 +15,8 @@ class ProductController extends Controller
         return response()->json(Product::with([
             'album.images:id,album_id,src',
             'user:id,name,university',
-            'user.image:id,user_id,src'
+            'user.image:id,user_id,src',
+            'reviews:id,client_id,freelancer_id,product_id,rating,review'
         ])->get(), 200);
     }
 
@@ -24,7 +25,8 @@ class ProductController extends Controller
         return response()->json(Product::with([
             'album.images:id,album_id,src',
             'user:id,name,university',
-            'user.image:id,user_id,src'
+            'user.image:id,user_id,src',
+            'reviews:id,client_id,freelancer_id,product_id,rating,review'
         ])->where('user_id', JWTAuth::user()->id)->get(), 200);
     }
 
@@ -33,7 +35,8 @@ class ProductController extends Controller
         return response()->json(Product::with([
             'album.images:id,album_id,src',
             'user:id,name,university',
-            'user.image:id,user_id,src'
+            'user.image:id,user_id,src',
+            'reviews:id,client_id,freelancer_id,product_id,rating,review'
         ])->find($id), 200);
     }
 
@@ -42,7 +45,8 @@ class ProductController extends Controller
         return response()->json(Product::with([
             'album.images:id,album_id,src',
             'user:id,name,university',
-            'user.image:id,user_id,src'
+            'user.image:id,user_id,src',
+            'reviews:id,client_id,freelancer_id,product_id,rating,review'
         ])->where('user_id', $id)->get(), 200);
     }
 
