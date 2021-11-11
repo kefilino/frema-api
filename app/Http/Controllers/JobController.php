@@ -12,23 +12,23 @@ class JobController extends Controller
 {
     public function showJobs()
     {
-        return response()->json(Job::with('album.images')->get(), 200);
+        return response()->json(Job::with(['album.images', 'user:id,name,university,phone', 'user.image:id,user_id,src'])->get(), 200);
     }
 
     public function showJobsById($id)
     {
-        return response()->json(Job::with('album.images')->where('id', $id)->get(), 200);
+        return response()->json(Job::with(['album.images', 'user:id,name,university,phone', 'user.image:id,user_id,src'])->where('id', $id)->get(), 200);
     }
     
     public function showUserJobs()
     {
         $user = JWTAuth::user();
-        return response()->json(Job::with('album.images')->where('user_id', $user->id)->get(), 200);
+        return response()->json(Job::with(['album.images', 'user:id,name,university,phone', 'user.image:id,user_id,src'])->where('user_id', $user->id)->get(), 200);
     }
 
     public function showJobsByUserId($id)
     {
-        return response()->json(Job::with('album.images')->where('user_id', $id)->get(), 200);
+        return response()->json(Job::with(['album.images', 'user:id,name,university,phone', 'user.image:id,user_id,src'])->where('user_id', $id)->get(), 200);
     }
 
     public function create(Request $request)
