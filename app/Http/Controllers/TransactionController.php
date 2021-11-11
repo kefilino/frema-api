@@ -11,22 +11,59 @@ class TransactionController extends Controller
 {
     public function showUserTransactions()
     {
-        return response()->json(Transaction::with('product')->where('buyer_id', JWTAuth::user()->id)->orWhere('seller_id', JWTAuth::user()->id)->get(), 200);
+        return response()->json(
+            Transaction::with([
+                'product',
+                'seller:id,name',
+                'buyer:id,name',
+                'product.album.images:id,album_id,src',
+                'seller.image:id,user_id,src',
+                'buyer.image:id,user_id,src'
+            ])
+            ->where('buyer_id', JWTAuth::user()->id)
+            ->orWhere('seller_id', JWTAuth::user()->id)
+            ->get(), 200
+        );
     }
 
     public function showUserPurchases()
     {
-        return response()->json(Transaction::with('product')->where('buyer_id', JWTAuth::user()->id)->get(), 200);
+        return response()->json(
+            Transaction::with([
+                'product',
+                'seller:id,name',
+                'product.album.images:id,album_id,src',
+                'seller.image:id,user_id,src'
+            ])
+            ->where('buyer_id', JWTAuth::user()->id)
+            ->get(), 200
+        );
     }
     
     public function showUserSales()
     {
-        return response()->json(Transaction::with('product')->where('seller_id', JWTAuth::user()->id)->get(), 200);
+        return response()->json(
+            Transaction::with([
+                'product',
+                'buyer:id,name',
+                'product.album.images:id,album_id,src',
+                'buyer.image:id,user_id,src'
+            ])
+            ->where('seller_id', JWTAuth::user()->id)
+            ->get(), 200
+        );
     }
 
     public function showUserTransactionsById($id)
     {
-        $transaction = Transaction::with('product')->find($id);
+        $transaction = Transaction::with([
+            'product',
+            'seller:id,name',
+            'buyer:id,name',
+            'product.album.images:id,album_id,src',
+            'seller.image:id,user_id,src',
+            'buyer.image:id,user_id,src'
+        ])->find($id);
         if (!$transaction) {
             return response()->json(['status' => 'error', 'message' => 'Transaction not found'], 404);
         }
