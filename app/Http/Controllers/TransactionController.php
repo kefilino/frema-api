@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Tymon\JWTAuth\Facades\JWTAuth;
+
+use function PHPUnit\Framework\isEmpty;
 
 class TransactionController extends Controller
 {
@@ -71,6 +74,40 @@ class TransactionController extends Controller
             return response()->json(['status' => 'error', 'message' => 'User ID mismatch - Unauthorized'], 401);
         }
         return response()->json($transaction, 200);
+    }
+
+    public function getProductFile($id)
+    {
+        $transaction = Transaction::with([
+            'product',
+            'seller:id,name',
+            'buyer:id,name',
+            'product.album.images:id,album_id,src',
+            'seller.image:id,user_id,src',
+            'buyer.image:id,user_id,src'
+        ])->find($id);
+
+        $error = [];
+
+        if (!$transaction) {
+            $error['message'] = 'Transaction not found';
+            $error['code'] = 404;
+        }
+        else if ($transaction->buyer_id != JWTAuth::user()->id && $transaction->seller_id != JWTAuth::user()->id) {
+            $error['message'] = 'User ID mismatch - Unauthorized';
+            $error['code'] = 401;
+        }
+        else if (!file_exists($transaction->product_file)) {
+            $error['message'] = 'File does not exist';
+            $error['code'] = 404;
+        }
+
+        if (!isEmpty($error)) {
+            return response()->json(['status' => 'error', 'message' => $error['message']], $error['code']);
+        }        
+
+        $file = file_get_contents($transaction->product_file);
+        return response($file, 200)->header('Content-Type', 'image/jpeg');
     }
 
     public function create(Request $request)
@@ -172,16 +209,25 @@ class TransactionController extends Controller
 
         $transaction = Transaction::findOrFail($id);
 
-        if ($transaction->buyer_id != $user->id) {            
-            return response()->json(['status' => 'error', 'message' => 'User do not have permission to complete this transaction. Action denied.'], 401);
+        $error = [];
+
+        if ($transaction->buyer_id != $user->id) {
+            $error['message'] = 'User do not have permission to complete this transaction. Action denied.';
+            $error['code'] = 401;
         }
 
-        if ($transaction->status) {            
-            return response()->json(['status' => 'error', 'message' => 'Transaction is already complete.'], 409);
+        else if ($transaction->status) {
+            $error['message'] = 'Transaction is already complete.';
+            $error['code'] = 409;
         }
 
-        if (!$transaction->payment_file || !$transaction->product_file) {
-            return response()->json(['status' => 'error', 'message' => 'Transaction is still in progress.'], 403);
+        else if (!$transaction->payment_file || !$transaction->product_file || !$transaction->payment_status) {
+            $error['message'] = 'Transaction is still in progress.';
+            $error['code'] = 403;            
+        }
+
+        if (!isEmpty($error)) {
+            return response()->json(['status' => 'error', 'message' => $error['message']], $error['code']);
         }
 
         $transaction->update(['status' => true]);
@@ -193,6 +239,31 @@ class TransactionController extends Controller
         $transaction->notifications()->create([
             'user_id' => $transaction->seller_id,
             'message' => "Penjualan produk \"" . $transaction->product->title . "\" dengan ID transaksi: " . $transaction->id . " telah selesai."
+        ]);
+
+        $transaction->refresh();
+
+        return response()->json($transaction, 200);
+    }
+
+    public function confirmPayment($id)
+    {
+        $user = JWTAuth::user();       
+
+        if ($user->id != 1) {
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized.'], 401);
+        }
+
+        $transaction = Transaction::findOrFail($id);
+        $transaction->update(['payment_status' => true]);
+
+        $transaction->notifications()->create([
+            'user_id' => $transaction->buyer_id,
+            'message' => "Pembayaran produk \"" . $transaction->product->title . "\" dengan ID transaksi: " . $transaction->id . " telah dikonfirmasi."
+        ]);
+        $transaction->notifications()->create([
+            'user_id' => $transaction->seller_id,
+            'message' => "Pembayaran produk \"" . $transaction->product->title . "\" dengan ID transaksi: " . $transaction->id . " telah dikonfirmasi."
         ]);
 
         $transaction->refresh();

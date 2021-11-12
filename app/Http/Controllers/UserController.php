@@ -30,7 +30,7 @@ class UserController extends Controller
 
     public function showUserNotifications()
     {
-        return response()->json(User::find(JWTAuth::user()->id)->notifications, 200);
+        return response()->json(User::with('notifications')->find(JWTAuth::user()->id)->notifications, 200);
     }
 
     public function markNotificationAsRead($id)

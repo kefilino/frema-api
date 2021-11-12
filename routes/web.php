@@ -69,8 +69,10 @@ $router->group(['prefix' => 'api'], function () use ($router) {
             $router->get('/purchases', ['uses' => 'TransactionController@showUserPurchases']);
             $router->get('/sales', ['uses' => 'TransactionController@showUserSales']);
             $router->get('{id}', ['uses' => 'TransactionController@showUserTransactionsById']);
+            $router->get('/file/{id}', ['uses' => 'TransactionController@getProductFile']);
             $router->post('/', ['uses' => 'TransactionController@create']);
             $router->post('/complete/{id}', ['uses' => 'TransactionController@completeTransaction']);
+            $router->post('/confirm/{id}', ['uses' => 'TransactionController@confirmPayment']);
             $router->put('/pay/{id}', ['uses' => 'TransactionController@insertPaymentProof']);
             $router->put('/submit/{id}', ['uses' => 'TransactionController@insertProductProof']);
         });
