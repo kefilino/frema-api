@@ -69,13 +69,20 @@ class UserController extends Controller
             'password' => 'required|min:8',
             'password_confirmation' => 'required|min:8|same:password',
         ]);
-        User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
-        return response()->json(true, 201);
+        $login_request = new Request();
+        $login_request->setMethod('POST');
+        $login_request->request->add([
+            'email' => $user->email,
+            'password' => $user->password
+        ]);
+
+        return $this->login($login_request);
     }
 
     public function update(Request $request)
