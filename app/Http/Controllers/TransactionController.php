@@ -8,8 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
-use function PHPUnit\Framework\isEmpty;
-
 class TransactionController extends Controller
 {
     public function showUserTransactions()
@@ -223,7 +221,7 @@ class TransactionController extends Controller
             $error['code'] = 403;
         }
 
-        if (!isEmpty($error)) {
+        if (!empty($error)) {
             return response()->json(['status' => 'error', 'message' => $error['message']], $error['code']);
         }
 
