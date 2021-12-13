@@ -23,9 +23,10 @@ class TransactionController extends Controller
                 'seller.image:id,user_id,src',
                 'buyer.image:id,user_id,src'
             ])
-            ->where('buyer_id', JWTAuth::user()->id)
-            ->orWhere('seller_id', JWTAuth::user()->id)
-            ->get(), 200
+                ->where('buyer_id', JWTAuth::user()->id)
+                ->orWhere('seller_id', JWTAuth::user()->id)
+                ->get(),
+            200
         );
     }
 
@@ -38,11 +39,12 @@ class TransactionController extends Controller
                 'product.album.images:id,album_id,src',
                 'seller.image:id,user_id,src'
             ])
-            ->where('buyer_id', JWTAuth::user()->id)
-            ->get(), 200
+                ->where('buyer_id', JWTAuth::user()->id)
+                ->get(),
+            200
         );
     }
-    
+
     public function showUserSales()
     {
         return response()->json(
@@ -52,8 +54,9 @@ class TransactionController extends Controller
                 'product.album.images:id,album_id,src',
                 'buyer.image:id,user_id,src'
             ])
-            ->where('seller_id', JWTAuth::user()->id)
-            ->get(), 200
+                ->where('seller_id', JWTAuth::user()->id)
+                ->get(),
+            200
         );
     }
 
@@ -92,19 +95,17 @@ class TransactionController extends Controller
         if (!$transaction) {
             $error['message'] = 'Transaction not found';
             $error['code'] = 404;
-        }
-        else if ($transaction->buyer_id != JWTAuth::user()->id && $transaction->seller_id != JWTAuth::user()->id) {
+        } else if ($transaction->buyer_id != JWTAuth::user()->id && $transaction->seller_id != JWTAuth::user()->id) {
             $error['message'] = 'User ID mismatch - Unauthorized';
             $error['code'] = 401;
-        }
-        else if (!file_exists($transaction->product_file)) {
+        } else if (!file_exists($transaction->product_file)) {
             $error['message'] = 'File does not exist';
             $error['code'] = 404;
         }
 
-        if (!isEmpty($error)) {
+        if (!empty($error)) {
             return response()->json(['status' => 'error', 'message' => $error['message']], $error['code']);
-        }        
+        }
 
         $file = file_get_contents($transaction->product_file);
         return response($file, 200)->header('Content-Type', 'image/jpeg');
@@ -146,19 +147,19 @@ class TransactionController extends Controller
 
         $transaction = Transaction::findOrFail($id);
 
-        if ($transaction->buyer_id != $user->id) {            
+        if ($transaction->buyer_id != $user->id) {
             return response()->json(['status' => 'error', 'message' => 'User ID mismatch'], 401);
         }
 
-        if ($transaction->payment_status) {            
+        if ($transaction->payment_status) {
             return response()->json(['status' => 'error', 'message' => 'Transaction is already paid'], 409);
         }
-        
+
         $filename = $transaction->id . '_' . $user->id . '.' . $request->file('payment_file')->extension();
         $request->file('payment_file')->move(storage_path('transactions/payments'), $filename);
         $transaction->update([
             'payment_file' => storage_path('transactions/payments') . '/' . $filename
-        ]);        
+        ]);
         $transaction->refresh();
 
         $transaction->notifications()->create([
@@ -166,7 +167,7 @@ class TransactionController extends Controller
             'message' => "Pembeli telah mengunggah bukti pembayaran untuk produk \"" . $transaction->product->title .
                 "\" dengan ID transaksi: " . $transaction->id
         ]);
-        
+
         return response()->json($transaction, 201);
     }
 
@@ -180,14 +181,14 @@ class TransactionController extends Controller
 
         $transaction = Transaction::findOrFail($id);
 
-        if ($transaction->seller_id != $user->id) {            
+        if ($transaction->seller_id != $user->id) {
             return response()->json(['status' => 'error', 'message' => 'User ID mismatch'], 401);
         }
 
-        if ($transaction->status) {            
+        if ($transaction->status) {
             return response()->json(['status' => 'error', 'message' => 'Transaction is already complete'], 409);
         }
-        
+
         $filename = $transaction->id . '_' . $user->id . '.' . $request->file('product_file')->extension();
         $request->file('product_file')->move(storage_path('transactions/products'), $filename);
         $transaction->update([
@@ -214,16 +215,12 @@ class TransactionController extends Controller
         if ($transaction->buyer_id != $user->id) {
             $error['message'] = 'User do not have permission to complete this transaction. Action denied.';
             $error['code'] = 401;
-        }
-
-        else if ($transaction->status) {
+        } else if ($transaction->status) {
             $error['message'] = 'Transaction is already complete.';
             $error['code'] = 409;
-        }
-
-        else if (!$transaction->payment_file || !$transaction->product_file || !$transaction->payment_status) {
+        } else if (!$transaction->payment_file || !$transaction->product_file || !$transaction->payment_status) {
             $error['message'] = 'Transaction is still in progress.';
-            $error['code'] = 403;            
+            $error['code'] = 403;
         }
 
         if (!isEmpty($error)) {
@@ -248,7 +245,7 @@ class TransactionController extends Controller
 
     public function confirmPayment($id)
     {
-        $user = JWTAuth::user();       
+        $user = JWTAuth::user();
 
         if ($user->id != 1) {
             return response()->json(['status' => 'error', 'message' => 'Unauthorized.'], 401);
