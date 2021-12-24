@@ -17,7 +17,6 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
-
 $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('login', ['uses' => 'UserController@login']);
     $router->post('register', ['uses' => 'UserController@create']);
@@ -28,7 +27,6 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->group(['prefix' => 'user'], function () use ($router) {
             $router->get('/', ['uses' => 'UserController@showUserInfo']);
             $router->get('/notification', ['uses' => 'UserController@showUserNotifications']);
-            $router->get('{id}', ['uses' => 'UserController@showUserInfoById']);
             $router->post('/notification', ['uses' => 'UserController@markNotificationsAsRead']);
             $router->post('/notification/{id}', ['uses' => 'UserController@markNotificationAsRead']);
             $router->put('/', ['uses' => 'UserController@update']);
@@ -37,7 +35,6 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 
         $router->group(['prefix' => 'portfolio'], function () use ($router) {
             $router->get('/', ['uses' => 'PortfolioController@showPortfolio']);
-            $router->get('{id}', ['uses' => 'PortfolioController@showPortfolioByUserId']);
             $router->post('/', ['uses' => 'PortfolioController@create']);
             $router->put('{id}', ['uses' => 'PortfolioController@update']);
             $router->delete('{id}', ['uses' => 'PortfolioController@delete']);
@@ -45,10 +42,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         });
 
         $router->group(['prefix' => 'product'], function () use ($router) {
-            $router->get('/', ['uses' => 'ProductController@showAllProducts']);
             $router->get('/me', ['uses' => 'ProductController@showUserProducts']);
-            $router->get('{id}', ['uses' => 'ProductController@showProductById']);
-            $router->get('/user/{id}', ['uses' => 'ProductController@showProductsByUserId']);
             $router->post('/', ['uses' => 'ProductController@create']);
             $router->put('{id}', ['uses' => 'ProductController@update']);
             $router->delete('{id}', ['uses' => 'ProductController@delete']);
@@ -58,9 +52,6 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->group(['prefix' => 'review'], function () use ($router) {
             $router->get('/', ['uses' => 'ReviewController@showReviewsAsClient']);
             $router->get('/sales', ['uses' => 'ReviewController@showReviewsAsFreelancer']);
-            $router->get('{id}', ['uses' => 'ReviewController@showReviewById']);
-            $router->get('/product/{id}', ['uses' => 'ReviewController@showReviewByProductId']);
-            $router->get('/user/{id}', ['uses' => 'ReviewController@showReviewByUserId']);
             $router->post('{id}', ['uses' => 'ReviewController@create']);
         });
 
@@ -78,13 +69,36 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         });
 
         $router->group(['prefix' => 'job'], function () use ($router) {
-            $router->get('/all', ['uses' => 'JobController@showJobs']);
-            $router->get('{id}', ['uses' => 'JobController@showJobsById']);
             $router->get('/', ['uses' => 'JobController@showUserJobs']);
-            $router->get('/user/{id}', ['uses' => 'JobController@showJobsByUserId']);
             $router->post('/', ['uses' => 'JobController@create']);
             $router->put('{id}', ['uses' => 'JobController@update']);
             $router->delete('{id}', ['uses' => 'JobController@delete']);
         });
+    });
+
+    $router->group(['prefix' => 'user'], function () use ($router) {
+        $router->get('{id}', ['uses' => 'UserController@showUserInfoById']);
+    });
+
+    $router->group(['prefix' => 'portfolio'], function () use ($router) {
+        $router->get('{id}', ['uses' => 'PortfolioController@showPortfolioByUserId']);
+    });
+
+    $router->group(['prefix' => 'product'], function () use ($router) {
+        $router->get('/', ['uses' => 'ProductController@showAllProducts']);
+        $router->get('{id}', ['uses' => 'ProductController@showProductById']);
+        $router->get('/user/{id}', ['uses' => 'ProductController@showProductsByUserId']);
+    });
+
+    $router->group(['prefix' => 'review'], function () use ($router) {
+        $router->get('{id}', ['uses' => 'ReviewController@showReviewById']);
+        $router->get('/product/{id}', ['uses' => 'ReviewController@showReviewByProductId']);
+        $router->get('/user/{id}', ['uses' => 'ReviewController@showReviewByUserId']);
+    });
+
+    $router->group(['prefix' => 'job'], function () use ($router) {
+        $router->get('/all', ['uses' => 'JobController@showJobs']);
+        $router->get('{id}', ['uses' => 'JobController@showJobsById']);
+        $router->get('/user/{id}', ['uses' => 'JobController@showJobsByUserId']);
     });
 });

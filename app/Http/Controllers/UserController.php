@@ -176,7 +176,7 @@ class UserController extends Controller
     
     public function logout()
     {
-        JWTAuth::logout();
+        auth()->logout();
 
         return response()->json(['message' => 'Successfully logged out'], 200);
     }
